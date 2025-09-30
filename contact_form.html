@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form with Validation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input.error, textarea.error {
+            border-color: #e74c3c;
+            background-color: #fff5f5;
+        }
+
+        input.success, textarea.success {
+            border-color: #27ae60;
+            background-color: #f0fff4;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-alert {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .success-alert.show {
+            display: block;
+        }
+
+        .success-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .char-count.warning {
+            color: #f39c12;
+        }
+
+        .char-count.error {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Get In Touch</h1>
+        <p class="subtitle">Fill out the form below and we'll get back to you soon.</p>
+        
+        <div class="success-alert" id="successAlert">
+            <span class="success-icon">✓</span>
+            <strong>Success!</strong> Your message has been sent successfully.
+        </div>
+
+        <form id="contactForm" novalidate>
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    placeholder="Enter your full name"
+                >
+                <div class="error-message" id="nameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email address"
+                >
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea 
+                    id="message" 
+                    name="message" 
+                    placeholder="Enter your message here..."
+                ></textarea>
+                <div class="char-count" id="charCount">0 / 500 characters</div>
+                <div class="error-message" id="messageError"></div>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('contactForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const messageInput = document.getElementById('message');
+        const successAlert = document.getElementById('successAlert');
+        const charCount = document.getElementById('charCount');
+
+        // Validation rules
+        const validationRules = {
+            name: {
+                required: true,
+                minLength: 2,
+                maxLength: 50,
+                pattern: /^[a-zA-Z\s'-]+$/,
+                messages: {
+                    required: 'Name is required',
+                    minLength: 'Name must be at least 2 characters',
+                    maxLength: 'Name must be less than 50 characters',
+                    pattern: 'Name can only contain letters, spaces, hyphens, and apostrophes'
+                }
+            },
+            email: {
+                required: true,
+                pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                messages: {
+                    required: 'Email is required',
+                    pattern: 'Please enter a valid email address'
+                }
+            },
+            message: {
+                required: true,
+                minLength: 10,
+                maxLength: 500,
+                messages: {
+                    required: 'Message is required',
+                    minLength: 'Message must be at least 10 characters',
+                    maxLength: 'Message must be less than 500 characters'
+                }
+            }
+        };
+
+        // Validate individual field
+        function validateField(input) {
+            const fieldName = input.name;
+            const value = input.value.trim();
+            const rules = validationRules[fieldName];
+            const errorElement = document.getElementById(`${fieldName}Error`);
+
+            // Clear previous error
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+            input.classList.remove('error', 'success');
+
+            // Required check
+            if (rules.required && !value) {
+                showError(input, errorElement, rules.messages.required);
+                return false;
+            }
+
+            // Min length check
+            if (rules.minLength && value.length < rules.minLength) {
+                showError(input, errorElement, rules.messages.minLength);
+                return false;
+            }
+
+            // Max length check
+            if (rules.maxLength && value.length > rules.maxLength) {
+                showError(input, errorElement, rules.messages.maxLength);
+                return false;
+            }
+
+            // Pattern check
+            if (rules.pattern && !rules.pattern.test(value)) {
+                showError(input, errorElement, rules.messages.pattern);
+                return false;
+            }
+
+            // If all validations pass
+            input.classList.add('success');
+            return true;
+        }
+
+        // Show error message
+        function showError(input, errorElement, message) {
+            input.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        // Real-time validation on blur
+        nameInput.addEventListener('blur', () => validateField(nameInput));
+        emailInput.addEventListener('blur', () => validateField(emailInput));
+        messageInput.addEventListener('blur', () => validateField(messageInput));
+
+        // Character count for message
+        messageInput.addEventListener('input', () => {
+            const length = messageInput.value.length;
+            const maxLength = validationRules.message.maxLength;
+            charCount.textContent = `${length} / ${maxLength} characters`;
+
+            charCount.classList.remove('warning', 'error');
+            if (length > maxLength) {
+                charCount.classList.add('error');
+            } else if (length > maxLength * 0.8) {
+                charCount.classList.add('warning');
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validate all fields
+            const isNameValid = validateField(nameInput);
+            const isEmailValid = validateField(emailInput);
+            const isMessageValid = validateField(messageInput);
+
+            // If all fields are valid
+            if (isNameValid && isEmailValid && isMessageValid) {
+                // Show success message
+                successAlert.classList.add('show');
+                
+                // Log form data (in real app, this would be sent to server)
+                console.log('Form Data:', {
+                    name: nameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    message: messageInput.value.trim()
+                });
+
+                // Reset form
+                form.reset();
+                charCount.textContent = '0 / 500 characters';
+                
+                // Clear success states
+                nameInput.classList.remove('success');
+                emailInput.classList.remove('success');
+                messageInput.classList.remove('success');
+
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    successAlert.classList.remove('show');
+                }, 5000);
+            } else {
+                // Scroll to first error
+                const firstError = document.querySelector('.error');
+                if (firstError) {
+                    firstError.focus();
+                }
+            }
+        });
+
+        // Real-time validation on input (optional, for better UX)
+        [nameInput, emailInput, messageInput].forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.classList.contains('error') || input.classList.contains('success')) {
+                    validateField(input);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
